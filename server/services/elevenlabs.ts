@@ -119,7 +119,7 @@ export class ElevenLabsService {
                 time: reservationDetails.time,
                 partySize: String(reservationDetails.partySize),
                 specialInstructions: reservationDetails.specialInstructions || '',
-                reservation_id: reservationDetails.reservationId ? String(reservationDetails.reservationId) : ''
+                reservationId: reservationDetails.reservationId ? String(reservationDetails.reservationId) : ''
               },
               custom_llm_extra_body: {}
             }
