@@ -41,13 +41,14 @@ app.use((req, res, next) => {
   res.on("finish", () => {
     const duration = Date.now() - start;
     if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
+      let logLine = `[${new Date().toISOString()}] ${req.method} ${path} ${res.statusCode} in ${duration}ms`;
       if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+        logLine += ` :: Response: ${JSON.stringify(capturedJsonResponse)}`;
       }
-
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
+      
+      // Add request body if present
+      if (req.body && Object.keys(req.body).length > 0) {
+        logLine += ` :: Request: ${JSON.stringify(req.body)}`;
       }
 
       log(logLine);
