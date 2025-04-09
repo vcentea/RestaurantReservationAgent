@@ -76,12 +76,12 @@ export class ElevenLabsService {
    */
   async useExistingVoiceAgent(
     reservationDetails?: {
-      customerName: string;
+      personName: string;
       phoneNumber: string;
       date: string;
       time: string;
       partySize: number;
-      specialRequests?: string | null;
+      specialInstructions?: string | null;
       reservationId?: string; // Add reservation ID to be passed to the agent
     }
   ): Promise<{ id: string; callSid?: string }> {
@@ -93,11 +93,11 @@ export class ElevenLabsService {
     // Log the variables we would use to populate the agent's context
     if (reservationDetails) {
       console.log(`Preparing agent with variables:
-      - customerName: ${reservationDetails.customerName}
+      - personName: ${reservationDetails.personName}
       - date: ${reservationDetails.date}
       - time: ${reservationDetails.time}
       - partySize: ${reservationDetails.partySize}
-      - special_request: ${reservationDetails.specialRequests ? ' ' + reservationDetails.specialRequests : ''}
+      - specialInstructions: ${reservationDetails.specialInstructions ? ' ' + reservationDetails.specialInstructions : ''}
       - reservationId: ${reservationDetails.reservationId || 'Not provided'}`);
       
       try {
@@ -114,11 +114,11 @@ export class ElevenLabsService {
             to_number: reservationDetails.phoneNumber, // The restaurant's phone number
             conversation_initiation_client_data: {
               dynamic_variables: {
-                customerName: reservationDetails.customerName,
+                personName: reservationDetails.personName,
                 date: reservationDetails.date,
                 time: reservationDetails.time,
                 partySize: String(reservationDetails.partySize),
-                specialRequests: reservationDetails.specialRequests || '',
+                specialInstructions: reservationDetails.specialInstructions || '',
                 reservation_id: reservationDetails.reservationId ? String(reservationDetails.reservationId) : ''
               },
               custom_llm_extra_body: {}
@@ -164,16 +164,16 @@ export class ElevenLabsService {
     name: string,
     instructions: string,
     reservationDetails?: {
-      customerName: string;
+      personName: string;
       phoneNumber: string;
       date: string;
       time: string;
       partySize: number;
-      specialRequests?: string | null;
+      specialInstructions?: string | null;
       reservationId?: string; // Add reservation ID
     }
   ): Promise<{ id: string }> {
-    console.log(`[DEPRECATED] Creating voice agent "${name}" with instructions: ${instructions}`);
+    console.log(`[DEPRECATED] Calling createVoiceAgent - will use existing agent instead.`);
     
     // Forward to the new method that uses the existing agent
     const result = await this.useExistingVoiceAgent(reservationDetails);
@@ -188,17 +188,17 @@ export class ElevenLabsService {
   async simulateVoiceConversation(
     agentId: string, 
     reservationDetails: {
-      customerName: string;
+      personName: string;
       phoneNumber: string;
       date: string;
       time: string;
       partySize: number;
-      specialRequests?: string | null;
+      specialInstructions?: string | null;
       reservationId?: string; // Add reservationId parameter
     },
     restaurantResponses: string[] = []
   ): Promise<void> {
-    console.log(`Simulating voice conversation with agent ${agentId} for ${reservationDetails.customerName}`);
+    console.log(`Simulating voice conversation with agent ${agentId} for ${reservationDetails.personName}`);
     
     if (!reservationDetails.reservationId) {
       console.error("Missing reservationId in simulated conversation");
@@ -235,9 +235,9 @@ export class ElevenLabsService {
           statusMessage: success ? "Reservation confirmed" : "Reservation failed",
           confirmedDate: success ? reservationDetails.date : undefined,
           confirmedTime: success ? reservationDetails.time : undefined,
-          personName: success ? reservationDetails.customerName : undefined,
-          partySize: success ? reservationDetails.partySize : undefined,
-          specialInstructions: success ? (reservationDetails.specialRequests || "No special requests") : undefined
+          personName: success ? reservationDetails.personName : undefined,
+          partySize: success ? String(reservationDetails.partySize) : undefined,
+          specialInstructions: success ? (reservationDetails.specialInstructions || "No special requests") : undefined
         };
         
         // Get the correct API URL

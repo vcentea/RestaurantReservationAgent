@@ -88,12 +88,12 @@ export class TwilioService {
     try {
       // 1. Prepare the customer details for the voice agent
       const customerDetails = {
-        customerName: reservationDetails.name,
+        personName: reservationDetails.name,
         phoneNumber: phoneNumber, // Add the phone number for direct calling
         date: reservationDetails.date,
         time: reservationDetails.time,
         partySize: reservationDetails.partySize,
-        specialRequests: reservationDetails.specialRequests || null,
+        specialInstructions: reservationDetails.specialRequests || null,
         reservationId: reservationDetails.reservationId // Pass the reservation ID to ElevenLabs
       };
       
@@ -170,12 +170,12 @@ export class TwilioService {
         
         // Create customer details for simulation
         const customerDetails = {
-          customerName: reservationDetails.name,
+          personName: reservationDetails.name,
           phoneNumber: phoneNumber, // Add the phone number for direct calling
           date: reservationDetails.date,
           time: reservationDetails.time,
           partySize: reservationDetails.partySize,
-          specialRequests: reservationDetails.specialRequests || null,
+          specialInstructions: reservationDetails.specialRequests || null,
           reservationId: reservationDetails.reservationId // Pass the reservation ID to simulation as well
         };
         
