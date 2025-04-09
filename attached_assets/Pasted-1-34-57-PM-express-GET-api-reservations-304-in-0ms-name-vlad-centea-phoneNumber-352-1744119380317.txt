@@ -1,0 +1,36 @@
+1:34:57 PM [express] GET /api/reservations 304 in 0ms :: [{"name":" vlad centea","phoneNumber":"+352…
+Creating voice agent "Restaurant Reservation Assistant" with instructions: You are calling to make a reservation for  vlad centea 
+         for 3 people on 2025-04-10 at 19:34.
+         
+Error making call with Twilio: RestException [Error]: Account not authorized to call +352661239764. Perhaps you need to enable some international permissions: https://www.twilio.com/console/voice/calls/geo-permissions/low-risk
+    at success (/home/runner/workspace/node_modules/twilio/lib/base/Version.js:79:23)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async TwilioService.makeCall (/home/runner/workspace/server/services/twilio.ts:39:20)
+    at async TwilioService.makeReservationCall (/home/runner/workspace/server/services/twilio.ts:92:20)
+    at async initiateRestaurantCall (/home/runner/workspace/server/routes.ts:179:20) {
+  status: 400,
+  code: 21215,
+  moreInfo: 'https://www.twilio.com/docs/errors/21215',
+  details: undefined
+}
+Error making reservation call: RestException [Error]: Account not authorized to call +352661239764. Perhaps you need to enable some international permissions: https://www.twilio.com/console/voice/calls/geo-permissions/low-risk
+    at success (/home/runner/workspace/node_modules/twilio/lib/base/Version.js:79:23)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async TwilioService.makeCall (/home/runner/workspace/server/services/twilio.ts:39:20)
+    at async TwilioService.makeReservationCall (/home/runner/workspace/server/services/twilio.ts:92:20)
+    at async initiateRestaurantCall (/home/runner/workspace/server/routes.ts:179:20) {
+  status: 400,
+  code: 21215,
+  moreInfo: 'https://www.twilio.com/docs/errors/21215',
+  details: undefined
+}
+Error initiating restaurant call: RestException [Error]: Account not authorized to call +352661239764. Perhaps you need to enable some international permissions: https://www.twilio.com/console/voice/calls/geo-permissions/low-risk
+    at success (/home/runner/workspace/node_modules/twilio/lib/base/Version.js:79:23)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async TwilioService.makeCall (/home/runner/workspace/server/services/twilio.ts:39:20)
+    at async TwilioService.makeReservationCall (/home/runner/workspace/server/services/twilio.ts:92:20)
+    at async initiateRestaurantCall (/home/runner/workspace/server/routes.ts:179:20) {
+  status: 400,
+  code: 21215,
+  moreInfo: 'https://www.twilio.com/docs/errors/21215',
+  details: undefined

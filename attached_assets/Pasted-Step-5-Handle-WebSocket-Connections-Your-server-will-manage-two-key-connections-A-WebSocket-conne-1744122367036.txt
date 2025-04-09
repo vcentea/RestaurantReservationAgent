@@ -1,0 +1,127 @@
+Step 5: Handle WebSocket Connections
+Your server will manage two key connections:
+
+A WebSocket connection from Twilio for audio streaming.
+A connection to the ElevenLabs agent (likely via WebSocket or API).
+Here’s the detailed process:
+
+Twilio WebSocket Connection:
+
+When Twilio connects to wss://your-server.com/stream?name=John, your server receives the WebSocket connection.
+Parse the query parameters (e.g., name=John) to extract contextual data.
+Example (Node.js with ws):
+
+javascript
+
+Collapse
+
+Wrap
+
+Copy
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({ port: 8080 });
+
+wss.on('connection', (ws, req) => {
+  const urlParams = new URLSearchParams(req.url.split('?')[1]);
+  const name = urlParams.get('name'); // e.g., "John"
+  console.log(`Connected to Twilio with name: ${name}`);
+  // Proceed to connect to ElevenLabs
+});
+Connect to ElevenLabs:
+
+Use the ElevenLabs API or WebSocket to connect to your existing agent. You’ll need the agent ID and credentials.
+Upon connection, send an initial message with conversation initiation data, including dynamic variables like name.
+Hypothetical example (check ElevenLabs documentation for exact syntax):
+
+javascript
+
+Collapse
+
+Wrap
+
+Copy
+const elevenLabsWs = new WebSocket('wss://api.elevenlabs.io/agent/AGENT_ID', {
+  headers: { Authorization: 'Bearer YOUR_API_KEY' }
+});
+
+elevenLabsWs.on('open', () => {
+  elevenLabsWs.send(JSON.stringify({
+    variables: { name: name }, // Pass dynamic variables
+    start: true
+  }));
+});
+Relay Audio:
+
+Forward audio from Twilio (caller’s speech) to ElevenLabs.
+Forward audio from ElevenLabs (agent’s responses) back to Twilio.
+Example (Node.js):
+
+javascript
+
+Collapse
+
+Wrap
+
+Copy
+ws.on('message', (data) => {
+  // Audio from Twilio caller
+  elevenLabsWs.send(data); // Forward to ElevenLabs
+});
+
+elevenLabsWs.on('message', (data) => {
+  // Audio from ElevenLabs agent
+  ws.send(data); // Send back to Twilio
+});
+Handle Tool Calls:
+
+If the ElevenLabs agent requests a tool call (e.g., to check inventory via an API), it may send a message with function details.
+Implement the logic on your server (e.g., make an HTTP request to an external service) and return the result to the agent.
+Example:
+
+javascript
+
+Collapse
+
+Wrap
+
+Copy
+elevenLabsWs.on('message', (data) => {
+  const message = JSON.parse(data);
+  if (message.type === 'function_call' && message.function === 'checkInventory') {
+    // Call external API
+    const result = await fetch('https://api.example.com/inventory');
+    elevenLabsWs.send(JSON.stringify({ result: result }));
+  } else {
+    ws.send(data); // Relay audio to Twilio
+  }
+});
+Step 6: Personalization with Variables
+To ensure the agent uses variables like name:
+
+Pass them as query parameters in the Twilio WebSocket URL (e.g., ?name=John).
+Include them in the initial message to ElevenLabs when starting the conversation.
+Verify in the ElevenLabs agent configuration that it’s set to use these variables (e.g., in its script or prompts).
+For example, the agent might be configured to say, "Hi, {{name}}, how can I help you?" When you pass name=John, it becomes "Hi, John, how can I help you?"
+
+Step 7: Additional Considerations
+Scalability: If your app initiates multiple calls, ensure your server can handle concurrent WebSocket connections.
+Error Handling: Add logging and retry logic for failed connections or API requests.
+Latency: Optimize your server for low-latency audio relay to maintain a natural conversation flow.
+Recording: Use Twilio’s recording features if you need to save conversations.
+Credentials: Securely store Twilio and ElevenLabs API keys (e.g., in environment variables).
+Cost: Monitor Twilio and ElevenLabs usage to stay within budget.
+Complete Flow Summary
+App: Initiates a call via Twilio API with a TwiML URL (e.g., https://your-server.com/twiml?name=John).
+Server: Returns TwiML with a <Stream> to wss://your-server.com/stream?name=John.
+Twilio: Connects to your server’s WebSocket, streaming the caller’s audio.
+Server:
+Parses name=John from the WebSocket URL.
+Connects to the ElevenLabs agent’s WebSocket/API.
+Sends initial data ({ variables: { name: "John" } }).
+Relays audio between Twilio and ElevenLabs.
+Handles tool calls as needed.
+ElevenLabs Agent: Takes over the conversation, using variables and calling tools via your server.
+Resources
+ElevenLabs Documentation: Check the "Twilio outbound calls" section and API reference for exact WebSocket/API details.
+Twilio Documentation: Refer to the "Media Streams" and "REST API" sections.
+Sample Projects: Look for GitHub repositories (e.g., ElevenLabs’ Twilio examples) for working code.
